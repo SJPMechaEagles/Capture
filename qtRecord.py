@@ -88,8 +88,15 @@ class VideoWindow(PyQt5.QtWidgets.QMainWindow):
         self.recordButton.setIcon(self.style().standardIcon(PyQt5.QtWidgets.QStyle.SP_MediaPlay))
         self.recordButton.setStyleSheet('QPushButton {background-color: #26c6da}')
         self.recordButton.clicked.connect(self.toggleRecording)
+        self.comboBox = PyQt5.QtWidgets.QComboBox()
+        self.comboBox.addItem("1")
+        self.comboBox.addItem("2")
+        self.comboBox.addItem("3")
+        self.comboBox.addItem("4")
+        self.comboBox.activated[str].connect(self.matchSelected)
         controlLayout = PyQt5.QtWidgets.QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
+        controlLayout.addWidget(self.comboBox)
         controlLayout.addWidget(self.recordButton)
         
         #create the mainlayout that contains the viewfiner and controls
@@ -99,6 +106,7 @@ class VideoWindow(PyQt5.QtWidgets.QMainWindow):
         
         #apply the mainlayout
         centralWidget.setLayout(mainLayout)
+        self.updateWindowTitle()
         
     def toggleRecording(self):
         if (self.isRecording):
@@ -123,7 +131,24 @@ class VideoWindow(PyQt5.QtWidgets.QMainWindow):
     def onQuit(self):
         self.stopRecording()
         self.close()
-
+        
+    def matchSelected(self, match_number):
+        self.updateWindowTitle(match_number = match_number, teams = ['9228A', '9228B', '9228C', '9228D'])
+        
+    def updateWindowTitle(self, match_number=None, teams=None):
+        if (match_number == None or teams == None):
+                # initialization
+        	self.setWindowTitle('VEX Match Recorder - [Not Recording]')
+        else:
+            if (self.isRecording):
+        	    title = 'VEX Match Recorder - [Recording] Match ' + match_number + " Teams "
+            else:
+        	    title = 'VEX Match Recorder - [Not Recording] Match ' + match_number + " Teams "
+        	# add the teams to the title
+            for team in teams:
+        	    title += str(team) + " "
+            self.setWindowTitle(title)
+    
 if __name__ == '__main__':
     app = PyQt5.QtWidgets.QApplication(sys.argv)
     camera = Camera()
@@ -133,7 +158,6 @@ if __name__ == '__main__':
     
     window = VideoWindow(camera)
     window.resize(1000, 600)
-    window.setWindowTitle('Match Recorder')
     window.show()
     
     #run the app
