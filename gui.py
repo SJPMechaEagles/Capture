@@ -1,6 +1,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from datasource import Tournament
+import recordButton
 
 import camera
 
@@ -38,18 +39,15 @@ class VideoWindow(QMainWindow):
             self.startRecording()
 
     def startRecording(self):
-        self.camera.startRecording()
-        self.recordButton.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
-        # recording color: red
-        self.recordButton.setStyleSheet('QPushButton {background-color: #e57373}')
         self.isRecording = True
+        self.camera.startRecording()
+        self.recordButton.updateStyle(self.isRecording)
+        
 
     def stopRecording(self):
-        self.camera.stopRecording()
-        self.recordButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-        # default color: cyan
-        self.recordButton.setStyleSheet('QPushButton {background-color: #26c6da}')
         self.isRecording = False
+        self.camera.stopRecording()
+        self.recordButton.updateStyle(self.isRecording)
 
     def onQuit(self):
         self.stopRecording()
@@ -86,9 +84,7 @@ class VideoWindow(QMainWindow):
         self.setCentralWidget(centralWidget)
 
         # create the bottom control layout with buttons
-        self.recordButton = QPushButton()
-        self.recordButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-        self.recordButton.setStyleSheet('QPushButton {background-color: #26c6da}')
+        self.recordButton = recordButton.RecordButton()
         self.recordButton.clicked.connect(self.toggleRecording)
         self.comboBox = QComboBox()
         self.comboBox.addItem("1")

@@ -1,0 +1,17 @@
+from PyQt5.QtWidgets import QPushButton, QStyle
+
+class RecordButton(QPushButton):
+    def __init__(self, parent= None):
+        super(RecordButton,self).__init__(parent)
+        self.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.setStyleSheet('QPushButton {background-color: #26c6da}')
+
+    def updateStyle(self, isRecording):
+        if (isRecording):
+            self.setIcon(self.style().standardIcon(QStyle.SP_MediaStop))
+            # recording color: red
+            self.setStyleSheet('QPushButton {background-color: #e57373}')
+        else:
+            self.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+            # default color: cyan
+            self.setStyleSheet('QPushButton {background-color: #26c6da}')
