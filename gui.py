@@ -2,6 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from datasource import Tournament
 import recordButton
+import infoDisplay
 
 import camera
 
@@ -82,7 +83,10 @@ class VideoWindow(QMainWindow):
         # Create a widget for window contents
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
-
+		
+		# create the top information display row
+        self.infoDisplay = infoDisplay.InfoDisplay()
+		
         # create the bottom control layout with buttons
         self.recordButton = recordButton.RecordButton()
         self.recordButton.clicked.connect(self.toggleRecording)
@@ -99,6 +103,7 @@ class VideoWindow(QMainWindow):
 
         # create the mainlayout that contains the viewfiner and controls
         mainLayout = QVBoxLayout()
+        mainLayout.addLayout(self.infoDisplay)
         mainLayout.addWidget(self.camera.getViewFinder())
         mainLayout.addLayout(controlLayout)
 
