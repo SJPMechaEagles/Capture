@@ -21,8 +21,10 @@ class ManualMatchesDialog(QDialog):
         buttonsLayout = QHBoxLayout()
         self.buttonOK = QPushButton()
         self.buttonOK.setText("OK")
+        self.buttonOK.clicked.connect(self.saveData)
         self.buttonCancel = QPushButton()
         self.buttonCancel.setText("Cancel")
+        self.buttonCancel.clicked.connect(self.onQuit)
         buttonsLayout.addWidget(self.buttonOK)
         buttonsLayout.addWidget(self.buttonCancel)
         buttonsLayout.setContentsMargins(0, 0, 0, 0)
@@ -33,6 +35,10 @@ class ManualMatchesDialog(QDialog):
     
     def onQuit(self):
         self.close()
+    
+    # parse and save the table to a file
+    def saveData(self):
+    	pass
         
     def getMatches(self):
         pass
