@@ -31,6 +31,7 @@ class ManualMatchesDialog(QDialog):
         layout.addLayout(buttonsLayout)
         
         self.setLayout(layout)
+        self.setWindowTitle("Match Editor")
         # self.addWidget(self.tableView)
     
     def onQuit(self):
@@ -44,7 +45,7 @@ class ManualMatchesDialog(QDialog):
         pass
         
     def initTableWidget(self, tableWidget):
-    	tableWidget.setMinimumSize(505, 600)
+    	tableWidget.setMinimumSize(630, 650)
 
 class VexMatchesTable(QTableWidget):
     def __init__(self, *args, data=None):

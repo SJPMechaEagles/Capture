@@ -22,8 +22,9 @@ class VideoWindow(QMainWindow):
         fileMenu.addAction(exitAction)
 
         tournamentMenu = menubar.addMenu('&Tournament')
-        tournamentAction = QAction('&Tournament', self)
-        tournamentAction.triggered.connect(VideoWindow.configure)
+        tournamentAction = QAction('&Edit Matches', self)
+        tournamentAction.setShortcut("Ctrl+M")
+        tournamentAction.triggered.connect(self.configure)
         tournamentMenu.addAction(tournamentAction)
 
     def file(self):
