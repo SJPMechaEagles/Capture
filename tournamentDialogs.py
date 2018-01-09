@@ -2,7 +2,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
 import operator
-
+from datasource import create_test_tournament, current_tournament
+import datasource
+from datasource import Match
 class ManualMatchesDialog(QDialog):
     def __init__(self, parent=None):
         super(ManualMatchesDialog, self).__init__(parent)
@@ -12,8 +14,6 @@ class ManualMatchesDialog(QDialog):
         
         layout = QVBoxLayout()
         layout.setContentsMargins(0,0,0,0)
-        #self.tableView = QTableView()
-        # self.initTable(self.tableView)
         self.tableWidget = VexMatchesTable()
         self.initTableWidget(self.tableWidget)
         layout.addWidget(self.tableWidget)
@@ -47,23 +47,82 @@ class ManualMatchesDialog(QDialog):
     def initTableWidget(self, tableWidget):
     	tableWidget.setMinimumSize(630, 650)
 
-class VexMatchesTable(QTableWidget):
-    def __init__(self, *args, data=None):
-        QTableWidget.__init__(self, *args)
-        self.data = data
-        self.verticalHeader().setVisible(False)
-        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.verticalHeader().setDefaultSectionSize(25);
-        self.horizontalHeader().setStretchLastSection(True)
-        self.setColumnCount(5)
-        self.setRowCount(250)
-        headerLabels = ['Match #', 'Red 1', 'Red 2', 'Blue 1', 'Blue 2']
-        self.setHorizontalHeaderLabels(headerLabels)
-        self.setSortingEnabled(True)
-        # self.setData()
-        # self.resizeColumnsToContents()
-        # self.resizeRowsToContents()
- 
-    # initializes the table with a list of (team name red 1, team name red 2, ...)
-    def loadData(self, teams):
+class TournamentViewModel(QAbstractTableModel):
+    tournament = None
+    def __init__(self, *args, tournament):
+        QAbstractTableModel.__init__(self, *args)
+        self.tournament = tournament
+
+    def rowCount(self, parent=None, *args, **kwargs):
+        return len(self.tournament.matches)
+    def columnCount(self, parent=None, *args, **kwargs):
+        return 5
+    def data(self, index, role=Qt.DisplayRole):
+        row = index.row()
+        col = index.column()
+        if role == Qt.DisplayRole:
+            if col == 0:
+                return str(self.tournament.matches[row].num)
+            if col == 1:
+                return str(self.tournament.matches[row].red1)
+            if col == 2:
+                return str(self.tournament.matches[row].red2)
+            if col == 3:
+                return str(self.tournament.matches[row].blue1)
+            if col is 4:
+                return str(self.tournament.matches[row].blue2)
+        elif role is Qt. FontRole:
+            if col is 0:
+                return QFont().setBold(True)
+        elif role is Qt.BackgroundRole:
+            return QBrush(Qt.gray)
+        elif role is Qt.TextAlignmentRole:
+            return Qt.AlignCenter + Qt.AlignVCenter
+        elif role is Qt.CheckStateRole:
+            return QVariant
+        return QVariant()
+
+    def headerData(self, selection, orientation, role=Qt.DisplayRole):
+        role=Qt.DisplayRole
+        if role is Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                if selection is 0:
+                    return "Match Number"
+                if selection is 1:
+                    return "Red 1"
+                if selection is 2:
+                    return "Red 2"
+                if selection is 3:
+                    return "Blue 1"
+                if selection is 4:
+                    return "Blue 2"
+        return QVariant()
+
+    def setData(self, index, value, role=Qt.DisplayRole):
+        print(value)
+        if(index.row()== 0):
+            self.tournament.matches[index.column()].num = value
+        if (index.row() == 1):
+            self.tournament.matches[index.column()].red1 = value
+        if (index.row() == 2):
+            self.tournament.matches[index.column()].red2 = value
+        if (index.row() == 3):
+            self.tournament.matches[index.column()].blue1 = value
+        if (index.row() == 4):
+            self.tournament.matches[index.column()].blue2 = value
+        print(self.tournament.matches[index.column()])
+        self.dataChanged.emit(index,index, [Qt.EditRole])
+        return True
+    def flags(self, index):
+        return (Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+    def editComplete(self):
         pass
+
+class VexMatchesTable(QTableView):
+    def __init__(self, *args, data=None):
+        QTableView.__init__(self, *args)
+        create_test_tournament()
+        self.verticalHeader().setVisible(False)
+        self.horizontalHeader().setStretchLastSection(True)
+        t = TournamentViewModel(tournament=datasource.current_tournament)
+        self.setModel(t)

@@ -4,7 +4,7 @@ class RecordButton(QPushButton):
     def __init__(self, parent= None):
         super(RecordButton,self).__init__(parent)
         self.isRecording = False
-        self.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.setIcon(self.style().standardIcon(QStyle.SP_DialogNoButton))
         self.setStyleSheet('QPushButton {background-color: #26c6da}')
 
     def updateStyle(self, isRecording):
