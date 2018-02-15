@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
 import operator
-from datasource import create_test_tournament, current_tournament
+from datasource import create_test_tournament, current_tournament, add_match
 import datasource
 from datasource import Match
 import re
@@ -17,12 +17,13 @@ class ManualMatchesDialog(QDialog):
         layout = QVBoxLayout()
         layout.setContentsMargins(0,0,0,0)
 
-        self.tableWidget = VexMatchesTable()
-        self.initTableWidget(self.tableWidget)
-        layout.addWidget(self.tableWidget)
+        self.tableView = VexMatchesTable()
+        self.initTableView(self.tableView)
+        layout.addWidget(self.tableView)
 
         self.newRowButton = QPushButton()
         self.newRowButton.setText("New Match")
+        self.newRowButton.clicked.connect(self.addRow)
 
         bottomLayout = QVBoxLayout()
         bottomLayout.addWidget(self.newRowButton)
@@ -47,9 +48,9 @@ class ManualMatchesDialog(QDialog):
         self.setWindowTitle("Match Editor")
         # self.addWidget(self.tableView)
 
-    def addrow(self):
-        datasource.add_match(1)
-        self.inser
+    def addRow(self):
+        # datasource.add_match(1)
+        self.tableView.addEmptyMatch()
 
     def onQuit(self):
         self.close()
@@ -61,8 +62,8 @@ class ManualMatchesDialog(QDialog):
     def getMatches(self):
         pass
         
-    def initTableWidget(self, tableWidget):
-        tableWidget.setMinimumSize(630, 650)
+    def initTableView(self, tableView):
+        tableView.setMinimumSize(630, 650)
 
 class TournamentViewModel(QAbstractTableModel):
     tournament = None
@@ -78,8 +79,10 @@ class TournamentViewModel(QAbstractTableModel):
 
     def rowCount(self, parent=None, *args, **kwargs):
         return len(self.tournament.matches)
+    
     def columnCount(self, parent=None, *args, **kwargs):
         return 5
+    
     def data(self, index, role=Qt.DisplayRole):
         row = index.row()
         col = index.column()
@@ -140,18 +143,28 @@ class TournamentViewModel(QAbstractTableModel):
         return True
     def flags(self, index):
         return (Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+    
     def editComplete(self):
         pass
-
+    
     def isValidTeamNumber(self, number):
         pattern = re.compile('^[1-9]{1,6}[A-Z]?$')
         return pattern.match(str(number).upper())
-
 
 class VexMatchesTable(QTableView):
     def __init__(self, *args, data=None):
         QTableView.__init__(self, *args)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setStretchLastSection(True)
-        t = TournamentViewModel(tournament=datasource.current_tournament)
-        self.setModel(t)
+        self.tournamentModel = TournamentViewModel(tournament=datasource.current_tournament)
+        self.setModel(self.tournamentModel)
+    
+    def addEmptyMatch(self):
+        newIndex = len(datasource.current_tournament.matches)
+        datasource.add_match(0, '', '', '', '')
+        # reload model
+        self.tournamentModel = TournamentViewModel(tournament=datasource.current_tournament)
+        self.setModel(self.tournamentModel)
+        # refresh the model
+        self.selectRow(newIndex)
+        self.scrollToBottom();

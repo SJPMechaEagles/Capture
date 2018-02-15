@@ -59,11 +59,6 @@ def add_match(num, r1, r2, b1,b2):
     global current_tournament
     current_tournament.matches.append(m)
 
-def add_match(num):
-    m = Match(num)
-    global current_tournament
-    current_tournament.matches.append(m)
-
 class Match:
     def __str__(self) -> str:
         return super().__str__()
