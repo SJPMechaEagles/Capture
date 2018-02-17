@@ -90,6 +90,9 @@ def create_test_tournament():
     current_tournament.pull_from_db()
 
 class Match:
+
+    videos = []
+
     def __str__(self) -> str:
         return super().__str__()
 
@@ -104,15 +107,24 @@ class Match:
         self.blue3 = blue3
         self.instance=instance
 
-    def toId(self):
+    def toId(self, space=True):
+        if space:
+            if self.type is Match_Type.QUALIFICATION:
+                return 'Q# ' + str(self.num)
+            if self.type is Match_Type.QUARTERFINAL:
+                return 'QF# ' + str(self.instance) + '-' + str(self.num)
+            if self.type is Match_Type.SEMIFINAL:
+                return 'SF# ' + str(self.instance) + '-' + str(self.num)
+            if self.type is Match_Type.FINALS:
+                return 'Final# ' + str(self.instance) + '-' + str(self.num)
         if self.type is Match_Type.QUALIFICATION:
-            return 'Q# ' + str(self.num)
+            return 'Q#' + str(self.num)
         if self.type is Match_Type.QUARTERFINAL:
-            return 'QF# ' + str(self.instance) + '-' + str(self.num)
+            return 'QF#' + str(self.instance) + '-' + str(self.num)
         if self.type is Match_Type.SEMIFINAL:
-            return 'SF# ' + str(self.instance) + '-' + str(self.num)
+            return 'SF#' + str(self.instance) + '-' + str(self.num)
         if self.type is Match_Type.FINALS:
-            return 'Final# ' + str(self.instance) + '-' + str(self.num)
+            return 'Final#' + str(self.instance) + '-' + str(self.num)
 
 
     def __str__(self):

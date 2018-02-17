@@ -14,6 +14,7 @@ class ConfigurationWindow(QMainWindow):
 
 class VideoWindow(QMainWindow):
     id = 0
+    match_recording = None
 
     def createMenu(self):
         menubar = self.menuBar()
@@ -58,8 +59,9 @@ class VideoWindow(QMainWindow):
         self.updateStatusDisplay()
 
     def startRecording(self):
+        self.match_recording = get_current_tournament().matches[self.comboBox.currentIndex()]
         self.isRecording = True
-        self.camera.startRecording()
+        self.camera.startRecording(self.match_recording.toId(False))
         self.recordButton.updateStyle(self.isRecording)
         self.id = self.comboBox.currentIndex()
 
@@ -69,6 +71,7 @@ class VideoWindow(QMainWindow):
         self.recordButton.updateStyle(self.isRecording)
         self.id+=1
         self.comboBox.setCurrentIndex(self.id)
+        self.match_recording = None
 
     def onQuit(self):
         self.stopRecording()

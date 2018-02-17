@@ -2,6 +2,7 @@ from PyQt5.QtMultimedia import QMediaRecorder, QCamera, QCameraInfo, QCameraView
 import PyQt5.QtMultimedia as QtMultimedia
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtCore import QUrl, QObject
+from datetime import datetime
 
 import os
 import time
@@ -50,9 +51,9 @@ class Camera(QObject):
 
         print(self.recorder.outputLocation())
 
-    def startRecording(self):
+    def startRecording(self, id):
         directory = os.path.abspath(str(os.getcwd()))
-        filename = "test" + str(time.time()) + ".mp4"
+        filename = id + "_at:_" + str(datetime.isoformat(datetime.now())) + ".mp4"
         abs_path = os.path.join(directory, filename)
         self.recorder.setOutputLocation(QUrl(abs_path))
         self.recorder.record()
