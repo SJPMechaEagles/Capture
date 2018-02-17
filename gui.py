@@ -27,6 +27,10 @@ class VideoWindow(QMainWindow):
 
         fileMenu = menubar.addMenu('&File')
 
+        newAction = QAction('&New', self)
+        newAction.triggered.connect(VideoWindow.new)
+        fileMenu.addAction(newAction)
+
         openAction = QAction('&Open', self)
         openAction.triggered.connect(VideoWindow.open)
         fileMenu.addAction(openAction)
@@ -47,6 +51,9 @@ class VideoWindow(QMainWindow):
         tournamentPullAction.triggered.connect(self.pull)
         tournamentMenu.addAction(tournamentPullAction)
 
+    def new(self):
+        pass
+
     def reload_combo(self):
         for i in range(0, self.comboBox.count()):
             self.comboBox.removeItem(i)
@@ -60,7 +67,14 @@ class VideoWindow(QMainWindow):
             self.comboBox.activated[str].connect(self.matchSelected)
 
     def save(self):
-        get_current_tournament().save("test")
+        if get_current_tournament() is None:
+            print("Tournament None")
+            return
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        name,path = QFileDialog.getSaveFileName(None, None, "Save Tournament", None, "Tournament File (*.Tournament)", options=options)
+        print(name, path)
+        get_current_tournament().save(name)
 
     def pull(self):
         pass
@@ -68,7 +82,7 @@ class VideoWindow(QMainWindow):
     def open(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(None, "Select Tournament", filter="Vex tournament File (*.Tournament)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(None, "",  filter="Tournament File (*.Tournament)", options=options)
         if fileName:
             print(fileName)
             load_from_file(fileName)
@@ -83,6 +97,10 @@ class VideoWindow(QMainWindow):
         print(returnCode)
 
     def toggleRecording(self):
+        if get_current_tournament() is None:
+            print("Tournament None")
+            return
+
         if (self.isRecording):
             self.stopRecording()
         else:
@@ -91,6 +109,9 @@ class VideoWindow(QMainWindow):
         self.updateStatusDisplay()
 
     def startRecording(self):
+        if get_current_tournament() is None:
+            print("Tournament None")
+            return
         self.match_recording = get_current_tournament().matches[self.comboBox.currentIndex()]
         self.isRecording = True
         filename = self.match_recording.create_file_name()
@@ -100,6 +121,9 @@ class VideoWindow(QMainWindow):
         self.id = self.comboBox.currentIndex()
 
     def stopRecording(self):
+        if get_current_tournament() is None:
+            print("Tournament None")
+            return
         self.isRecording = False
         self.camera.stopRecording()
         self.recordButton.updateStyle(self.isRecording)
@@ -109,6 +133,7 @@ class VideoWindow(QMainWindow):
 
     def onQuit(self):
         self.stopRecording()
+        get_current_tournament().save()
         self.close()
 
     def matchSelected(self, match_number):
@@ -121,6 +146,9 @@ class VideoWindow(QMainWindow):
         self.infoDisplay.updateInfo(self.match_number, ['9228A', '9228B', '9228C', '9228D'], self.isRecording)
 
     def updateWindowTitle(self, match_number=None, teams=None):
+        if get_current_tournament() is None:
+            self.setWindowTitle('VEX Match Recorder - [No Tournament Selected]')
+            return
         if (match_number == None or teams == None):
             # initialization
             self.setWindowTitle('VEX Match Recorder - [No Match Selected]')

@@ -27,6 +27,7 @@ class Tournament:
     date = None
     matches = None
     season = None
+    filename = None
 
     def  __init__(self, name):
        self.name = name
@@ -34,7 +35,15 @@ class Tournament:
        global current_tournament
        current_tournament = self
 
+    def save(self):
+        if self.filename is not None:
+            self.save(self.filename)
+        else:
+            print("Cannot save Filename is None")
+            self.save("Autosave_tournament")
+
     def save(self, filename):
+        self.filename = filename
         print("save to " + filename)
         with open(filename + ".Tournament", 'wb') as file:
             pickle.dump(self, file)

@@ -6,6 +6,7 @@ class RecordButton(QPushButton):
         self.isRecording = False
         self.setIcon(self.style().standardIcon(QStyle.SP_DialogNoButton))
         self.setStyleSheet('QPushButton {background-color: #26c6da}')
+        self.setDisabled(True)
 
     def updateStyle(self, isRecording):
         self.isRecording = isRecording
