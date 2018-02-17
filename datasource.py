@@ -2,6 +2,7 @@ from enum import Enum
 import requests
 import pickle
 import datetime
+from datetime import *
 current_tournament = None
 
 def get_current_tournament():
@@ -143,6 +144,10 @@ class Match:
         if self.type is Match_Type.FINALS:
             return 'Final#' + str(self.instance) + '-' + str(self.num)
 
+
+    def create_file_name(self):
+        filename = self.toId() + "_" + str(datetime.isoformat(datetime.now())) + ".mp4"
+        return filename
 
     def __str__(self):
         return f'Match {self.num} r1: {self.red1} r2: {self.red2} b1: {self.blue1} b2:{self.blue2}'

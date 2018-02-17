@@ -93,7 +93,9 @@ class VideoWindow(QMainWindow):
     def startRecording(self):
         self.match_recording = get_current_tournament().matches[self.comboBox.currentIndex()]
         self.isRecording = True
-        self.camera.startRecording(self.match_recording.toId(False))
+        filename = self.match_recording.create_file_name()
+        self.camera.startRecording(filename)
+        self.match_recording.videos.append(self.match_recording.create_file_name())
         self.recordButton.updateStyle(self.isRecording)
         self.id = self.comboBox.currentIndex()
 

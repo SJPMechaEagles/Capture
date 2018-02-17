@@ -51,9 +51,8 @@ class Camera(QObject):
 
         print(self.recorder.outputLocation())
 
-    def startRecording(self, id):
+    def startRecording(self, filename):
         directory = os.path.abspath(str(os.getcwd()))
-        filename = id + "_at:_" + str(datetime.isoformat(datetime.now())) + ".mp4"
         abs_path = os.path.join(directory, filename)
         self.recorder.setOutputLocation(QUrl(abs_path))
         self.recorder.record()
