@@ -5,9 +5,9 @@ import sys
 
 from gui import *
 from datasource import *
+from tournamentDialogs import *
 
 if __name__ == '__main__':
-    create_test_tournament()
     app = PyQt5.QtWidgets.QApplication(sys.argv)
     camera = Camera()
     print("Created Camera")
@@ -15,10 +15,11 @@ if __name__ == '__main__':
     camera.startVid()
     
     window = VideoWindow(camera)
-    window.resize(1000, 600)
+    window.resize(1600, 900)
     window.show()
+    create_test_tournament()
     print("2")
-    
+
     #run the app
     returnCode = app.exec_()
     camera.stopRecording()

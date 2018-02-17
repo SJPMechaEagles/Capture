@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QDialog, QLabel,QComboBox
+from PyQt5 import QtCore
+from PyQt5.Qt import *
 
 import sys
 
@@ -21,6 +23,8 @@ class SelectTournamentDialog(QDialog):
 
         self.setGeometry(300,300,300,300)
         self.setWindowTitle("Select Tournament")
+        self.setModal(True)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.show()
 
         print("Test2")

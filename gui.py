@@ -22,10 +22,19 @@ class VideoWindow(QMainWindow):
         fileMenu.addAction(exitAction)
 
         tournamentMenu = menubar.addMenu('&Tournament')
-        tournamentAction = QAction('&Edit Matches', self)
-        tournamentAction.setShortcut("Ctrl+M")
-        tournamentAction.triggered.connect(self.configure)
-        tournamentMenu.addAction(tournamentAction)
+
+        tournamentEditAction = QAction('&Edit Matches', self)
+        tournamentEditAction.setShortcut("Ctrl+M")
+        tournamentEditAction.triggered.connect(self.configure)
+        tournamentMenu.addAction(tournamentEditAction)
+
+        tournamentPullAction = QAction('&Pull From Database', self)
+        tournamentPullAction.setShortcut("Ctrl+P")
+        tournamentPullAction.triggered.connect(self.pull)
+        tournamentMenu.addAction(tournamentPullAction)
+
+    def pull(self):
+        pass
 
     def file(self):
         print("file")
