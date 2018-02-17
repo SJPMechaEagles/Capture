@@ -1,11 +1,17 @@
 from enum import Enum
 import requests
-
+import pickle
 import datetime
 current_tournament = None
 
 def get_current_tournament():
     return current_tournament
+
+
+def set_current_tournament(tournament):
+    global current_tournament
+    current_tournament = tournament
+
 
 class Match_Type(Enum):
     QUALIFICATION = 2
@@ -26,6 +32,11 @@ class Tournament:
        self.matches = []
        global current_tournament
        current_tournament = self
+
+    def save(self, filename):
+        print("save to " + filename)
+        with open(filename + ".Tournament", 'wb') as file:
+            pickle.dump(self, file)
 
     def update_match_data(self):
         if self.sku is not None:
@@ -88,6 +99,12 @@ def create_test_tournament():
     current_tournament = Tournament('Southern New England Championship')
     current_tournament.sku = "RE-VRC-16-1659"
     current_tournament.pull_from_db()
+
+def load_from_file(filename):
+    with open(filename, 'rb') as file:
+        global current_tournament
+        current_tournament = pickle.load(file)
+        print(current_tournament)
 
 class Match:
 

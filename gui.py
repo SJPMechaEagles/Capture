@@ -4,7 +4,9 @@ from datasource import get_current_tournament
 import recordButton
 import infoDisplay
 from tournamentDialogs import ManualMatchesDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 
+from datasource import Tournament, load_from_file
 import camera
 
 class ConfigurationWindow(QMainWindow):
@@ -12,17 +14,26 @@ class ConfigurationWindow(QMainWindow):
         super(ConfigurationWindow, self).__init__()
         
 
+vWindow = None
+
 class VideoWindow(QMainWindow):
     id = 0
     match_recording = None
 
     def createMenu(self):
+        global vWindow
+        vWindow= self
         menubar = self.menuBar()
 
         fileMenu = menubar.addMenu('&File')
-        exitAction = QAction('&File', self)
-        exitAction.triggered.connect(VideoWindow.file)
-        fileMenu.addAction(exitAction)
+
+        openAction = QAction('&Open', self)
+        openAction.triggered.connect(VideoWindow.open)
+        fileMenu.addAction(openAction)
+
+        saveAction = QAction('&Save', self)
+        saveAction.triggered.connect(VideoWindow.save)
+        fileMenu.addAction(saveAction)
 
         tournamentMenu = menubar.addMenu('&Tournament')
 
@@ -36,19 +47,40 @@ class VideoWindow(QMainWindow):
         tournamentPullAction.triggered.connect(self.pull)
         tournamentMenu.addAction(tournamentPullAction)
 
+    def reload_combo(self):
+        for i in range(0, self.comboBox.count()):
+            self.comboBox.removeItem(i)
+        current_tournament = get_current_tournament()
+        print(current_tournament)
+        if current_tournament is not None:
+            for match in current_tournament.matches:
+                self.comboBox.addItem(match.toId())
+            self.id = 0
+            self.match_recording = None
+            self.comboBox.activated[str].connect(self.matchSelected)
+
+    def save(self):
+        get_current_tournament().save("test")
+
     def pull(self):
         pass
 
-    def file(self):
-        print("file")
+    def open(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(None, "Select Tournament", filter="Vex tournament File (*.Tournament)", options=options)
+        if fileName:
+            print(fileName)
+            load_from_file(fileName)
+            global vWindow
+            vWindow.reload_combo()
+
 
     def configure(self):
         print("loading tournament")
         dialog = ManualMatchesDialog();
         returnCode=dialog.exec_()
         print(returnCode)
-        # tourn = Tournament("test")
-        # tourn.pull_from_db()
 
     def toggleRecording(self):
         if (self.isRecording):
@@ -114,7 +146,7 @@ class VideoWindow(QMainWindow):
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
 		
-		# create the top information display row
+        # create the top information display row
         self.infoDisplay = infoDisplay.InfoDisplay()
 		
         # create the bottom control layout with buttons
@@ -122,10 +154,10 @@ class VideoWindow(QMainWindow):
         self.recordButton.clicked.connect(self.toggleRecording)
         self.comboBox = QComboBox()
         current_tournament = get_current_tournament()
-        print(current_tournament)
-        for match in current_tournament.matches:
-            self.comboBox.addItem(match.toId())
-        self.comboBox.activated[str].connect(self.matchSelected)
+        if current_tournament is not None:
+            for match in current_tournament.matches:
+                self.comboBox.addItem(match.toId())
+            self.comboBox.activated[str].connect(self.matchSelected)
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
         controlLayout.addWidget(self.comboBox)
