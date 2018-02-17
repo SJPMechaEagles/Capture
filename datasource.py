@@ -4,6 +4,9 @@ import requests
 import datetime
 current_tournament = None
 
+def get_current_tournament():
+    return current_tournament
+
 class Match_Type(Enum):
     QUALIFICATION = 2
     QUARTERFINAL = 3
@@ -21,6 +24,8 @@ class Tournament:
     def  __init__(self, name):
        self.name = name
        self.matches = []
+       global current_tournament
+       current_tournament = self
 
     def update_match_data(self):
         if self.sku is not None:

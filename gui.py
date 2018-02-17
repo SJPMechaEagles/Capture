@@ -1,6 +1,6 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from datasource import Tournament
+from datasource import get_current_tournament
 import recordButton
 import infoDisplay
 from tournamentDialogs import ManualMatchesDialog
@@ -13,6 +13,8 @@ class ConfigurationWindow(QMainWindow):
         
 
 class VideoWindow(QMainWindow):
+    id = 0
+
     def createMenu(self):
         menubar = self.menuBar()
 
@@ -59,12 +61,14 @@ class VideoWindow(QMainWindow):
         self.isRecording = True
         self.camera.startRecording()
         self.recordButton.updateStyle(self.isRecording)
-        
+        self.id = self.comboBox.currentIndex()
 
     def stopRecording(self):
         self.isRecording = False
         self.camera.stopRecording()
         self.recordButton.updateStyle(self.isRecording)
+        self.id+=1
+        self.comboBox.setCurrentIndex(self.id)
 
     def onQuit(self):
         self.stopRecording()
@@ -114,10 +118,10 @@ class VideoWindow(QMainWindow):
         self.recordButton = recordButton.RecordButton()
         self.recordButton.clicked.connect(self.toggleRecording)
         self.comboBox = QComboBox()
-        self.comboBox.addItem("1")
-        self.comboBox.addItem("2")
-        self.comboBox.addItem("3")
-        self.comboBox.addItem("4")
+        current_tournament = get_current_tournament()
+        print(current_tournament)
+        for match in current_tournament.matches:
+            self.comboBox.addItem(match.toId())
         self.comboBox.activated[str].connect(self.matchSelected)
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)

@@ -8,6 +8,7 @@ from datasource import *
 from tournamentDialogs import *
 
 if __name__ == '__main__':
+    create_test_tournament()
     app = PyQt5.QtWidgets.QApplication(sys.argv)
     camera = Camera()
     print("Created Camera")
@@ -17,7 +18,6 @@ if __name__ == '__main__':
     window = VideoWindow(camera)
     window.resize(1600, 900)
     window.show()
-    create_test_tournament()
     print("2")
 
     #run the app

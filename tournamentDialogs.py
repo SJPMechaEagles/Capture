@@ -62,7 +62,7 @@ class ManualMatchesDialog(QDialog):
         pass
         
     def initTableView(self, tableView):
-        tableView.setMinimumSize(700, 900)
+        tableView.setMinimumSize(720, 500)
 
 class TournamentViewModel(QAbstractTableModel):
     tournament = None
