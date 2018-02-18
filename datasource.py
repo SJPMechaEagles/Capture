@@ -21,6 +21,20 @@ class Match_Type(Enum):
     FINALS = 5
 
 
+def create_tournament_if_valid(sku, name, team):
+    params = dict()
+    if sku is not None or sku is not "":
+        params['sku'] = sku
+    if name is not None or name is not "":
+        params['team'] = team
+    params['program'] = 'VRC'
+
+    resp = requests.get('https://api.vexdb.io/v1/get_events', params)
+    json_resp = resp.json()
+    if json_resp['size'] is 0:
+        return None
+    return json_resp['result']
+
 class Tournament:
     name = None
     sku = None

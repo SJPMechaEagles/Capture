@@ -5,6 +5,8 @@ import recordButton
 import infoDisplay
 from tournamentDialogs import ManualMatchesDialog
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
+from newTournamentWidget import *
+
 
 from datasource import Tournament, load_from_file
 import camera
@@ -28,7 +30,7 @@ class VideoWindow(QMainWindow):
         fileMenu = menubar.addMenu('&File')
 
         newAction = QAction('&New', self)
-        newAction.triggered.connect(VideoWindow.new)
+        newAction.triggered.connect(VideoWindow.new_tournament)
         fileMenu.addAction(newAction)
 
         openAction = QAction('&Open', self)
@@ -51,8 +53,22 @@ class VideoWindow(QMainWindow):
         tournamentPullAction.triggered.connect(self.pull)
         tournamentMenu.addAction(tournamentPullAction)
 
-    def new(self):
-        pass
+    def reload(self):
+        self.update()
+        self.reload_combo()
+        self.updateStatusDisplay()
+        self.updateWindowTitle()
+        if get_current_tournament() is not None:
+            self.recordButton.setEnabled(True)
+        else:
+            self.recordButton.setEnabled(False)
+
+    def new_tournament(self):
+        t = NewTournamentWidget()
+        if t.exec() is 1:
+            global vWindow
+            vWindow.reload()
+
 
     def reload_combo(self):
         for i in range(0, self.comboBox.count()):
