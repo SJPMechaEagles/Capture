@@ -11,14 +11,12 @@ if __name__ == '__main__':
     #create_test_tournament()
     app = PyQt5.QtWidgets.QApplication(sys.argv)
     camera = Camera()
-    print("Created Camera")
     camera.iniCamera()
     camera.startVid()
     
     window = VideoWindow(camera)
     window.resize(1600, 900)
     window.show()
-    print("2")
 
     #run the app
     returnCode = app.exec_()

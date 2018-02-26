@@ -48,9 +48,9 @@ class VideoWindow(QMainWindow):
         tournamentEditAction.triggered.connect(self.configure)
         tournamentMenu.addAction(tournamentEditAction)
 
-        tournamentPullAction = QAction('&Pull From Database', self)
-        tournamentPullAction.setShortcut("Ctrl+P")
-        tournamentPullAction.triggered.connect(self.pull)
+        tournamentPullAction = QAction('&Update Schedule', self)
+        tournamentPullAction.setShortcut("Ctrl+U")
+        tournamentPullAction.triggered.connect(self.updatepull)
         tournamentMenu.addAction(tournamentPullAction)
 
     def reload(self):
@@ -80,7 +80,7 @@ class VideoWindow(QMainWindow):
                 self.comboBox.addItem(match.toId())
             self.id = 0
             self.match_recording = None
-            self.comboBox.activated[str].connect(self.matchSelected)
+            self.comboBox.activated.connect(self.matchSelected)
 
     def save(self):
         if get_current_tournament() is None:
@@ -92,8 +92,10 @@ class VideoWindow(QMainWindow):
         print(name, path)
         get_current_tournament().save(name)
 
-    def pull(self):
-        pass
+    def updatepull(self):
+        if get_current_tournament() is not None:
+            get_current_tournament().update_match_data()
+            self.reload()
 
     def open(self):
         options = QFileDialog.Options()
@@ -152,14 +154,23 @@ class VideoWindow(QMainWindow):
         get_current_tournament().save()
         self.close()
 
-    def matchSelected(self, match_number):
-        self.match_number = match_number
+    def matchSelected(self):
+        self.match_number = self.comboBox.currentIndex()
         # update the window title and status bar
         self.updateStatusDisplay()
         
     def updateStatusDisplay(self):
-        self.updateWindowTitle(match_number=self.match_number, teams=['9228A', '9228B', '9228C', '9228D'])
-        self.infoDisplay.updateInfo(self.match_number, ['9228A', '9228B', '9228C', '9228D'], self.isRecording)
+        teams = ['','','','']
+        if get_current_tournament() is not None and self.match_number is not None:
+            if self.match_number is None:
+                self.match_number = 0
+            r1 = get_current_tournament().matches[self.match_number].red1
+            r2 = get_current_tournament().matches[self.match_number].red2
+            b1 = get_current_tournament().matches[self.match_number].blue1
+            b2 = get_current_tournament().matches[self.match_number].blue2
+            teams = [r1, r2, b1, b2]
+        self.updateWindowTitle(match_number=self.match_number, teams=teams)
+        self.infoDisplay.updateInfo(self.match_number, teams, self.isRecording)
 
     def updateWindowTitle(self, match_number=None, teams=None):
         if get_current_tournament() is None:
@@ -170,9 +181,9 @@ class VideoWindow(QMainWindow):
             self.setWindowTitle('VEX Match Recorder - [No Match Selected]')
         else:
             if (self.isRecording):
-                title = 'VEX Match Recorder - Match ' + match_number + " Teams "
+                title = 'VEX Match Recorder - Match ' + match_number_to_string(match_number) + " Teams "
             else:
-                title = 'VEX Match Recorder - Match ' + match_number + " Teams "
+                title = 'VEX Match Recorder - Match ' + match_number_to_string(match_number) + " Teams "
             # add the teams to the title
             for team in teams:
                 title += str(team) + " "
@@ -203,7 +214,7 @@ class VideoWindow(QMainWindow):
         if current_tournament is not None:
             for match in current_tournament.matches:
                 self.comboBox.addItem(match.toId())
-            self.comboBox.activated[str].connect(self.matchSelected)
+            self.comboBox.activated.connect(self.matchSelected)
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
         controlLayout.addWidget(self.comboBox)

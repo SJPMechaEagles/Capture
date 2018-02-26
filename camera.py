@@ -1,11 +1,11 @@
-from PyQt5.QtMultimedia import QMediaRecorder, QCamera, QCameraInfo, QCameraViewfinderSettings, QAudioEncoderSettings, QVideoEncoderSettings, QCameraImageCapture
-import PyQt5.QtMultimedia as QtMultimedia
-from PyQt5.QtMultimediaWidgets import QCameraViewfinder
-from PyQt5.QtCore import QUrl, QObject
-from datetime import datetime
-
 import os
-import time
+
+import PyQt5.QtMultimedia as QtMultimedia
+from PyQt5.QtCore import QUrl, QObject
+from PyQt5.QtMultimedia import QMediaRecorder, QCamera, QCameraInfo, QCameraViewfinderSettings, QAudioEncoderSettings, \
+    QVideoEncoderSettings
+from PyQt5.QtMultimediaWidgets import QCameraViewfinder
+
 
 class Camera(QObject):
     def __init__(self, parent=QObject()):

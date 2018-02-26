@@ -37,21 +37,35 @@ class NewTournamentWidget(QDialog):
         self.searchButton.clicked.connect(self.search)
         self.mainLayout.addWidget(self.searchButton)
 
+        self.manuallyButton = QPushButton("Create Tournament Manually")
+        self.manuallyButton.clicked.connect(self.dontSearch)
+        self.mainLayout.addWidget(self.manuallyButton)
+
         self.setLayout(self.mainLayout)
         self.setWindowTitle("New Tournament")
 
+    def dontSearch(self):
+        name = self.nameLine.text()
+        sku = self.skuLine.text()
+        tournament = Tournament(name)
+        tournament.sku = sku
+        self.accept()
+
     def search(self):
-        if self.select_combo is not None:
-            self.mainLayout.removeWidget(self.select_combo)
-            self.select_combo = None
-        if self.done_button is not None:
-            self.mainLayout.removeWidget(self.done_button)
-            self.done_button = None
         sku = self.skuLine.text()
         team = self.requiresTeamEdit.text()
         name = self.nameLine.text()
         self.options = create_tournament_if_valid(sku, name, team)
         if self.options is not None:
+            if self.manuallyButton is not None:
+                self.mainLayout.removeWidget(self.manuallyButton)
+                self.manuallyButton = None
+            if self.select_combo is not None:
+                self.mainLayout.removeWidget(self.select_combo)
+                self.select_combo = None
+            if self.done_button is not None:
+                self.mainLayout.removeWidget(self.done_button)
+                self.done_button = None
             tournamentsCombo = QComboBox()
             self.select_combo = tournamentsCombo
             for option in self.options:

@@ -4,6 +4,8 @@ import pickle
 import datetime
 from datetime import *
 current_tournament = None
+from gui import *
+import os
 
 def get_current_tournament():
     return current_tournament
@@ -35,6 +37,9 @@ def create_tournament_if_valid(sku, name, team):
         return None
     return json_resp['result']
 
+def match_number_to_string(num):
+    return get_current_tournament().matches[num].toId()
+
 class Tournament:
     name = None
     sku = None
@@ -59,14 +64,24 @@ class Tournament:
     def save(self, filename):
         self.filename = filename
         print("save to " + filename)
-        with open(filename + ".Tournament", 'wb') as file:
+        os.mkdir(filename + ".Tournament.bundle")
+        with open(filename + ".Tournament.bundle/manifest.dat", 'wb') as file:
             pickle.dump(self, file)
 
     def update_match_data(self):
         if self.sku is not None:
-            self.matches = self.pull_match_schedule_from_db()
-        else:
-            print("")
+            new_matches = self.pull_match_schedule_from_db()
+            for new_match in new_matches:
+                for old_match in get_current_tournament().matches:
+                    if new_match.toId() == old_match.toId():
+                        old_match.red1 = old_match.red1
+                        old_match.red2 = old_match.red2
+                        old_match.blue1 = old_match.blue1
+                        old_match.blue2 = old_match.blue2
+                    else:
+                        get_current_tournament().matches.append(new_match)
+            global vWindow
+            vWindow.reload()
 
     def pull_match_schedule_from_db(self):
         params = dict()
