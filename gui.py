@@ -7,6 +7,7 @@ from tournamentDialogs import ManualMatchesDialog
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 from newTournamentWidget import *
 
+import os
 
 from datasource import Tournament, load_from_file
 import camera
@@ -16,29 +17,29 @@ class ConfigurationWindow(QMainWindow):
         super(ConfigurationWindow, self).__init__()
         
 
-vWindow = None
 
 class VideoWindow(QMainWindow):
     id = 0
     match_recording = None
 
     def createMenu(self):
-        global vWindow
-        vWindow= self
         menubar = self.menuBar()
 
         fileMenu = menubar.addMenu('&File')
 
         newAction = QAction('&New', self)
-        newAction.triggered.connect(VideoWindow.new_tournament)
+        newAction.setShortcut("Ctrl+N")
+        newAction.triggered.connect(self.new_tournament)
         fileMenu.addAction(newAction)
 
         openAction = QAction('&Open', self)
-        openAction.triggered.connect(VideoWindow.open)
+        openAction.setShortcut("Ctrl+O")
+        openAction.triggered.connect(self.open)
         fileMenu.addAction(openAction)
 
         saveAction = QAction('&Save', self)
-        saveAction.triggered.connect(VideoWindow.save)
+        saveAction.setShortcut("Ctrl+S")
+        saveAction.triggered.connect(self.save)
         fileMenu.addAction(saveAction)
 
         tournamentMenu = menubar.addMenu('&Tournament')
@@ -66,8 +67,7 @@ class VideoWindow(QMainWindow):
     def new_tournament(self):
         t = NewTournamentWidget()
         if t.exec() is 1:
-            global vWindow
-            vWindow.reload()
+            self.reload()
 
 
     def reload_combo(self):
@@ -77,7 +77,7 @@ class VideoWindow(QMainWindow):
         print(current_tournament)
         if current_tournament is not None:
             for match in current_tournament.matches:
-                self.comboBox.addItem(match.toId())
+                self.comboBox.addItem(match.toInfoString())
             self.id = 0
             self.match_recording = None
             self.comboBox.activated.connect(self.matchSelected)
@@ -88,9 +88,10 @@ class VideoWindow(QMainWindow):
             return
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        name,path = QFileDialog.getSaveFileName(None, None, "Save Tournament", None, "Tournament File (*.Tournament)", options=options)
-        print(name, path)
-        get_current_tournament().save(name)
+        name,path = QFileDialog.getSaveFileName(None, "t", filter="Tournament File (*.Tournament)", options=options)
+        
+        if (path != ""):
+            get_current_tournament().save(name)
 
     def updatepull(self):
         if get_current_tournament() is not None:
@@ -104,8 +105,8 @@ class VideoWindow(QMainWindow):
         if fileName:
             print(fileName)
             load_from_file(fileName)
-            global vWindow
-            vWindow.reload_combo()
+            self.reload_combo()
+            self.remember_default(str(fileName))
 
 
     def configure(self):
@@ -151,7 +152,7 @@ class VideoWindow(QMainWindow):
 
     def onQuit(self):
         self.stopRecording()
-        get_current_tournament().save()
+        self.save()
         self.close()
 
     def matchSelected(self):
@@ -213,7 +214,7 @@ class VideoWindow(QMainWindow):
         current_tournament = get_current_tournament()
         if current_tournament is not None:
             for match in current_tournament.matches:
-                self.comboBox.addItem(match.toId())
+                self.comboBox.addItem(match.toInfoString())
             self.comboBox.activated.connect(self.matchSelected)
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
@@ -229,3 +230,22 @@ class VideoWindow(QMainWindow):
         # apply the mainlayout
         centralWidget.setLayout(mainLayout)
         self.updateWindowTitle()
+
+        #load default tournament file
+        self.load_default()
+
+    # loads the default touranment file
+    def load_default(self):
+        try:
+            file = open("defaults.cfg", "r")
+        except:
+            return # file not fuond
+        fileName = file.read()
+        if fileName:
+            print("loading default: " + fileName)
+            load_from_file(fileName)
+            self.reload_combo()
+
+    def remember_default(self, filename):
+        file = open("defaults.cfg", "w")
+        file.write(filename)

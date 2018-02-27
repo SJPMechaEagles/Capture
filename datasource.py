@@ -182,6 +182,16 @@ class Match:
         if self.type is Match_Type.FINALS:
             return 'Final#' + str(self.instance) + '-' + str(self.num)
 
+    def toInfoString(self):
+        if (self.red3 is None):
+            red3 = ""
+        else:
+            red3 = self.red3
+        if(self.blue3 is None):
+            blue3 = ""
+        else:
+            blue3 = self.blue3
+        return self.toId() + " Red: %s %s %s | Blue: %s %s %s"%(self.red1, self.red2, red3, self.blue1, self.blue2, blue3)
 
     def create_file_name(self):
         filename = self.toId() + "_" + str(datetime.isoformat(datetime.now())) + ".mp4"
