@@ -88,7 +88,7 @@ class VideoWindow(QMainWindow):
             return
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        name,path = QFileDialog.getSaveFileName(None, "t", filter="Tournament File (*.Tournament)", options=options)
+        name,path = QFileDialog.getSaveFileName(self, "Save Tournament", filter="Tournament File (*.Tournament)", options=options)
         
         if (path != ""):
             get_current_tournament().save(name)
@@ -134,7 +134,7 @@ class VideoWindow(QMainWindow):
         self.match_recording = get_current_tournament().matches[self.comboBox.currentIndex()]
         self.isRecording = True
         filename = self.match_recording.create_file_name()
-        self.camera.startRecording(filename)
+        self.camera.startRecording("videos/" + filename)
         self.match_recording.videos.append(self.match_recording.create_file_name())
         self.recordButton.updateStyle(self.isRecording)
         self.id = self.comboBox.currentIndex()
@@ -243,8 +243,11 @@ class VideoWindow(QMainWindow):
         fileName = file.read()
         if fileName:
             print("loading default: " + fileName)
-            load_from_file(fileName)
-            self.reload_combo()
+            try:
+                load_from_file(fileName)
+                self.reload_combo()
+            except:
+                print("Failed to load default tournament file!")
 
     def remember_default(self, filename):
         file = open("defaults.cfg", "w")

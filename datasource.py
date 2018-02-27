@@ -64,8 +64,8 @@ class Tournament:
     def save(self, filename):
         self.filename = filename
         print("save to " + filename)
-        os.mkdir(filename + ".Tournament.bundle")
-        with open(filename + ".Tournament.bundle/manifest.dat", 'wb') as file:
+        # os.mkdir(filename + ".Tournament.bundle")
+        with open(filename, 'wb') as file:
             pickle.dump(self, file)
 
     def update_match_data(self):
