@@ -9,8 +9,13 @@ from newTournamentWidget import *
 
 import os
 
-from datasource import Tournament, load_from_file
+from datasource import load_from_file
 import camera
+
+vWindow = None
+
+def reload_gui():
+    vWindow.reload()
 
 class ConfigurationWindow(QMainWindow):
     def __init__(self):
@@ -71,8 +76,7 @@ class VideoWindow(QMainWindow):
 
 
     def reload_combo(self):
-        for i in range(0, self.comboBox.count()):
-            self.comboBox.removeItem(i)
+        self.comboBox.clear()
         current_tournament = get_current_tournament()
         print(current_tournament)
         if current_tournament is not None:
@@ -192,6 +196,8 @@ class VideoWindow(QMainWindow):
 
     def __init__(self, camera, parent=None):
         super(VideoWindow, self).__init__(parent)
+        global vWindow
+        vWindow = self
         self.createMenu()
         self.camera = camera
         # quit on alt+f4 or ctrl+w

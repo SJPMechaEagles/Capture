@@ -1,11 +1,12 @@
-from enum import Enum
-import requests
-import pickle
 import datetime
+import pickle
 from datetime import *
+from enum import Enum
+
+import requests
+
 current_tournament = None
-from gui import *
-import os
+
 
 def get_current_tournament():
     return current_tournament
@@ -70,20 +71,27 @@ class Tournament:
 
     def update_match_data(self):
         if self.sku is not None:
-            new_matches = self.pull_match_schedule_from_db()
-            for new_match in new_matches:
-                for old_match in get_current_tournament().matches:
-                    if new_match.toId() == old_match.toId():
-                        old_match.red1 = old_match.red1
-                        old_match.red2 = old_match.red2
-                        old_match.blue1 = old_match.blue1
-                        old_match.blue2 = old_match.blue2
-                    else:
-                        get_current_tournament().matches.append(new_match)
-            global vWindow
-            vWindow.reload()
+            new_matches = self.update_from_db()
+
+            matches_to_add = []
+            old_matches = get_current_tournament().matches
+
+            for new in new_matches:
+                old_match_bool = False
+                for old in old_matches:
+                    if old.toId() == new.toId():
+                        print('same')
+                        old_match_bool = True
+                if not old_match_bool:
+                    print('new')
+
+            get_current_tournament().matches.extend(matches_to_add)
 
     def pull_match_schedule_from_db(self):
+        self.matches = self.update_from_db()
+
+
+    def update_from_db(self):
         params = dict()
         print("Pulling from db")
         if self.sku is None:
@@ -94,39 +102,23 @@ class Tournament:
         print("request")
         resp = requests.get('https://api.vexdb.io/v1/get_matches', params)
         matches = resp.json()['result']
-        print(matches)
+        results = []
         for match in matches:
             print("adding match " + str(match['matchnum']))
-            if match['round'] is 2:
-                self.add_match(match['matchnum'], match["red1"], match["red2"], match["blue1"], match["blue2"])
-            else:
-                #elimination match
-                self.add_match(match['matchnum'], match["red1"], match["red2"],
-                               match["blue1"], match["blue2"], r3=match['red3'], b3=match['blue3'],
-                               type=Match_Type(match['round']), instance=match['instance'])
-
-
-    def pull_from_db(self):
-        print('finding tournament')
-        params = dict()
-        if self.sku is not None:
-            params['sku'] = self.sku
-        if self.date is not None:
-            params['date'] = self.date
-        params['season'] = self.season
-        params['program'] = 'VRC'
-
-        resp = requests.get('https://api.vexdb.io/v1/get_events', params)
-        json_resp = resp.json()
-        if json_resp['status'] is not 1:
-            print("failed to get db info")
-            return None
-        if (json_resp['size'] is 1):
-            self.sku = json_resp['result'][0]['sku']
-            self.pull_match_schedule_from_db()
-        else:
-            print(json_resp)
-            print("More or less than one")
+            new_match = Match(None, None, None, None)
+            new_match.num = match['matchnum']
+            new_match.red1 = match["red1"]
+            new_match.red2 = match["red2"]
+            new_match.blue1 = match["blue1"]
+            new_match.blue2 = match["blue2"]
+            new_match.type = Match_Type(match['round'])
+            new_match.instance = match['instance']
+            if match['round'] is not 2:
+                # not elimination match
+                new_match.red3 = match['red3']
+                new_match.blue3 = match['blue3']
+            results.append(new_match)
+        return results
 
 
     def add_match(self, num, r1, r2, b1, b2, type = Match_Type.QUALIFICATION, r3=None, b3=None, instance=None):

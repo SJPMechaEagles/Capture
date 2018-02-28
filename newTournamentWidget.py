@@ -86,7 +86,7 @@ class NewTournamentWidget(QDialog):
         name = self.options[index]['name']
         t = Tournament(name)
         t.sku = sku
-        t.pull_from_db()
+        t.pull_match_schedule_from_db()
         self.accept()
 
     def closeEvent(self, QCloseEvent):
