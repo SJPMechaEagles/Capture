@@ -6,6 +6,7 @@ import infoDisplay
 from tournamentDialogs import ManualMatchesDialog
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 from newTournamentWidget import *
+from matchesView import *
 
 import os
 
@@ -58,6 +59,16 @@ class VideoWindow(QMainWindow):
         tournamentPullAction.setShortcut("Ctrl+U")
         tournamentPullAction.triggered.connect(self.updatepull)
         tournamentMenu.addAction(tournamentPullAction)
+
+        viewMatchesAction = QAction('&View Matches', self)
+        viewMatchesAction.setShortcut("Ctrl+V")
+        viewMatchesAction.triggered.connect(self.viewMatches)
+        tournamentMenu.addAction(viewMatchesAction)
+
+    def viewMatches(self):
+        m = RecordedViewMatchDialog()
+        if m.exec() is 1:
+            self.reload()
 
     def reload(self):
         self.update()
@@ -133,13 +144,14 @@ class VideoWindow(QMainWindow):
 
     def startRecording(self):
         if get_current_tournament() is None:
-            print("Tournament None")
+            print("Tournament None!")
             return
         self.match_recording = get_current_tournament().matches[self.comboBox.currentIndex()]
         self.isRecording = True
         filename = self.match_recording.create_file_name()
         self.camera.startRecording("videos/" + filename)
-        self.match_recording.videos.append(self.match_recording.create_file_name())
+        get_current_tournament().matches[self.comboBox.currentIndex()]\
+            .videos.append(self.match_recording.create_file_name())
         self.recordButton.updateStyle(self.isRecording)
         self.id = self.comboBox.currentIndex()
 
@@ -151,6 +163,7 @@ class VideoWindow(QMainWindow):
         self.camera.stopRecording()
         self.recordButton.updateStyle(self.isRecording)
         self.id+=1
+        get_current_tournament().save()
         self.comboBox.setCurrentIndex(self.id)
         self.match_recording = None
 

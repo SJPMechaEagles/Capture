@@ -21,5 +21,4 @@ if __name__ == '__main__':
     #run the app
     returnCode = app.exec_()
     camera.stopRecording()
-    print("stopped")
     sys.exit(returnCode)

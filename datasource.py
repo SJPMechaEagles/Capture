@@ -41,6 +41,10 @@ def create_tournament_if_valid(sku, name, team):
 def match_number_to_string(num):
     return get_current_tournament().matches[num].toId()
 
+
+
+
+
 class Tournament:
     name = None
     sku = None
@@ -55,17 +59,17 @@ class Tournament:
        global current_tournament
        current_tournament = self
 
-    def save(self):
-        if self.filename is not None:
-            self.save(self.filename)
-        else:
-            print("Cannot save Filename is None")
-            self.save("Autosave_tournament")
-
-    def save(self, filename):
+    def save(self, filename = None):
+        if filename is None:
+            if self.filename is not None:
+                self.save(self.filename)
+            else:
+                print("Cannot save Filename is None")
+                self.save("Autosave.tournament")
+            return
         self.filename = filename
         print("save to " + filename)
-        # os.mkdir(filename + ".Tournament.bundle")
+        self.filename = filename
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
 
@@ -104,7 +108,6 @@ class Tournament:
         matches = resp.json()['result']
         results = []
         for match in matches:
-            print("adding match " + str(match['matchnum']))
             new_match = Match(None, None, None, None)
             new_match.num = match['matchnum']
             new_match.red1 = match["red1"]
@@ -154,6 +157,7 @@ class Match:
         self.blue2 = blue2
         self.blue3 = blue3
         self.instance=instance
+        self.videos = []
 
     def toId(self, space=True):
         if space:

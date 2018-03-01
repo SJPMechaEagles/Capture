@@ -177,6 +177,8 @@ class VexMatchesTable(QTableView):
         self.horizontalHeader().setStretchLastSection(True)
         self.tournamentModel = TournamentViewModel(tournament=datasource.current_tournament)
         self.setModel(self.tournamentModel)
+        self.setAlternatingRowColors(True)
+        self.setShowGrid(True)
     
     def addEmptyMatch(self):
         newIndex = len(datasource.current_tournament.matches)
@@ -187,4 +189,4 @@ class VexMatchesTable(QTableView):
         self.setModel(self.tournamentModel)
         # refresh the model
         self.selectRow(newIndex)
-        self.scrollToBottom();
+        self.scrollToBottom()
