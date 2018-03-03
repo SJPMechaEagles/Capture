@@ -75,10 +75,6 @@ class VideoWindow(QMainWindow):
         self.reload_combo()
         self.updateStatusDisplay()
         self.updateWindowTitle()
-        if get_current_tournament() is not None:
-            self.recordButton.setEnabled(True)
-        else:
-            self.recordButton.setEnabled(False)
 
     def new_tournament(self):
         t = NewTournamentWidget()
@@ -132,7 +128,6 @@ class VideoWindow(QMainWindow):
 
     def toggleRecording(self):
         if get_current_tournament() is None:
-            print("Tournament None")
             return
 
         if (self.isRecording):
@@ -233,6 +228,7 @@ class VideoWindow(QMainWindow):
         # create the bottom control layout with buttons
         self.recordButton = recordButton.RecordButton()
         self.recordButton.clicked.connect(self.toggleRecording)
+
         self.comboBox = QComboBox()
         current_tournament = get_current_tournament()
         if current_tournament is not None:
@@ -256,6 +252,8 @@ class VideoWindow(QMainWindow):
 
         #load default tournament file
         self.load_default()
+
+        self.recordButton.updateStyle(False)
 
     # loads the default touranment file
     def load_default(self):
