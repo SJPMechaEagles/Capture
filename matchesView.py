@@ -7,7 +7,10 @@ import datasource
 from datasource import *
 from datasource import Match
 import re
+import os
+import string
 
+videos = []
 
 class RecordedViewMatchDialog(QDialog):
     def __init__(self, parent=None):
@@ -34,12 +37,11 @@ class RecordedViewMatchDialog(QDialog):
 
 class RecordedMatchesViewModel(QAbstractTableModel):
 
-    videos = []
-
     def __init__(self, *args, tournament):
         QAbstractTableModel.__init__(self, *args)
         self.tournament = get_current_tournament()
-        self.videos = self.getVideos()
+        global videos
+        videos = self.getVideos()
 
 
     def setHeaderData(self, index, orientation, role=Qt.DisplayRole):
@@ -48,45 +50,47 @@ class RecordedMatchesViewModel(QAbstractTableModel):
         return QAbstractTableModel.headerData(self, index, orientation, role)
 
     def rowCount(self, parent=None, *args, **kwargs):
-        return len(self.videos)
+        global videos
+        return len(videos)
 
     def getVideos(self):
         print("Videos")
-        videos = []
+        videos_array = []
         for match in get_current_tournament().matches:
             print(match.videos)
             for video in match.videos:
                 video_tuple = (video, match)
-                videos.append(video_tuple)
+                videos_array.append(video_tuple)
 
-        return videos
+        return videos_array
 
 
     def columnCount(self, parent=None, *args, **kwargs):
         return 9
 
     def data(self, index, role=Qt.DisplayRole):
+        global videos
         row = index.row()
         col = index.column()
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
             if col == 0:
-                return str(self.videos[index.row()][1].toId())
+                return str(videos[index.row()][1].toId())
             if col == 1:
-                return str(self.videos[index.row()][1].red1)
+                return str(videos[index.row()][1].red1)
             if col == 2:
-                return str(self.videos[index.row()][1].red2)
+                return str(videos[index.row()][1].red2)
             if col == 3:
-                return str(self.videos[index.row()][1].red3)
+                return str(videos[index.row()][1].red3)
             if col == 4:
-                return str(self.videos[index.row()][1].blue1)
+                return str(videos[index.row()][1].blue1)
             if col is 5:
-                return str(self.videos[index.row()][1].blue2)
+                return str(videos[index.row()][1].blue2)
             if col == 6:
-                return str(self.videos[index.row()][1].blue3)
+                return str(videos[index.row()][1].blue3)
             if col == 7:
-                return str(self.videos[index.row()][0])
+                return str(videos[index.row()][0])
             if col == 8:
                 return "Watch"
 
@@ -154,7 +158,14 @@ class WatchPushButtonDelegate(QItemDelegate):
         if not self.parent().indexWidget(index):
             #TODO implement player
             self.parent().setIndexWidget(index,QPushButton(index.data(),self.parent(),clicked=
-                lambda x: print(index.row())
+                lambda x: self.play_video(index)
             ))
 
+    def play_video(self, index):
+        global videos
+        filename = videos[index.row()][0]
+        print(filename)
+        command = "open \"videos/" + filename + "\""
+        print(command)
+        os.system(command)
 

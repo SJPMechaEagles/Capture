@@ -151,7 +151,7 @@ class VideoWindow(QMainWindow):
         filename = self.match_recording.create_file_name()
         self.camera.startRecording("videos/" + filename)
         get_current_tournament().matches[self.comboBox.currentIndex()]\
-            .videos.append(self.match_recording.create_file_name())
+            .videos.append(filename)
         self.recordButton.updateStyle(self.isRecording)
         self.id = self.comboBox.currentIndex()
 
@@ -168,6 +168,7 @@ class VideoWindow(QMainWindow):
         self.match_recording = None
 
     def onQuit(self):
+        print("quit")
         self.stopRecording()
         self.save()
         self.close()
@@ -206,6 +207,9 @@ class VideoWindow(QMainWindow):
             for team in teams:
                 title += str(team) + " "
             self.setWindowTitle(title)
+
+    def closeEvent(self, QCloseEvent):
+        self.onQuit()
 
     def __init__(self, camera, parent=None):
         super(VideoWindow, self).__init__(parent)

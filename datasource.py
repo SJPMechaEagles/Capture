@@ -42,9 +42,6 @@ def match_number_to_string(num):
     return get_current_tournament().matches[num].toId()
 
 
-
-
-
 class Tournament:
     name = None
     sku = None
@@ -60,15 +57,16 @@ class Tournament:
        current_tournament = self
 
     def save(self, filename = None):
-        if filename is None:
-            if self.filename is not None:
-                self.save(self.filename)
-            else:
-                print("Cannot save Filename is None")
-                self.save("Autosave.tournament")
+        print(filename)
+
+        if filename is None and self.filename is not None:
+            self.save(self.filename)
             return
-        self.filename = filename
-        print("save to " + filename)
+        if filename is None and self.filename is None:
+            print("Cannot save Filename is None")
+            self.save("Autosave.tournament")
+            return
+
         self.filename = filename
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
