@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import operator
-from datasource import create_test_tournament, current_tournament
+from datasource import create_test_tournament, current_tournament, get_current_tournament
 import datasource
 from datasource import *
 from datasource import Match
@@ -20,10 +20,16 @@ class RecordedViewMatchDialog(QDialog):
         self.shortcut.activated.connect(self.onQuit)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(2, 2, 2, 2)
+
+        self.searchBox = QLineEdit()
+        self.setMaximumHeight(100)
+        self.setMaximumHeight(10)
+        self.searchBox.textChanged.connect(self.search)
 
         self.tableView = RecordedMatchesTable()
         self.initTableView(self.tableView)
+        layout.addWidget(self.searchBox)
         layout.addWidget(self.tableView)
 
         self.setLayout(layout)
@@ -35,6 +41,30 @@ class RecordedViewMatchDialog(QDialog):
     def initTableView(self, tableView):
         tableView.setMinimumSize(900, 500)
 
+    def search(self):
+        matches = get_current_tournament().matches
+        text = self.searchBox.text()
+        print(text)
+        for i in range(0, len(matches)):
+            found = False
+            if text in matches[i].red1: found = True
+            if text in matches[i].red2: found = True
+            if matches[i].red3 is not None:
+                if text in matches[i].red3: found = True
+            if text in matches[i].blue1: found = True
+            if text in matches[i].blue2: found = True
+            if matches[i].blue3 is not None:
+                if text in matches[i].blue3: found = True
+
+            print(i)
+            if found:
+                self.tableView.showRow(i)
+            else:
+                self.tableView.hideRow(i)
+
+
+
+
 class RecordedMatchesViewModel(QAbstractTableModel):
 
     def __init__(self, *args, tournament):
@@ -42,7 +72,6 @@ class RecordedMatchesViewModel(QAbstractTableModel):
         self.tournament = get_current_tournament()
         global videos
         videos = self.getVideos()
-
 
     def setHeaderData(self, index, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:
@@ -138,12 +167,13 @@ class RecordedMatchesViewModel(QAbstractTableModel):
 
 
 class RecordedMatchesTable(QTableView):
-    def __init__(self, *args, data=None):
-        QTableView.__init__(self, *args)
+    def __init__(self, *args, parent=None):
+        QTableView.__init__(self, parent)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setStretchLastSection(True)
         self.tournamentModel = RecordedMatchesViewModel(tournament=datasource.current_tournament)
         self.setModel(self.tournamentModel)
+
         self.setAlternatingRowColors(True)
         self.setShowGrid(False)
         self.setItemDelegateForColumn(8, WatchPushButtonDelegate(self))
