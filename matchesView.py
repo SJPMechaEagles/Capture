@@ -42,27 +42,7 @@ class RecordedViewMatchDialog(QDialog):
         tableView.setMinimumSize(900, 500)
 
     def search(self):
-        matches = get_current_tournament().matches
-        text = self.searchBox.text()
-        print(text)
-        for i in range(0, len(matches)):
-            found = False
-            if text in matches[i].red1: found = True
-            if text in matches[i].red2: found = True
-            if matches[i].red3 is not None:
-                if text in matches[i].red3: found = True
-            if text in matches[i].blue1: found = True
-            if text in matches[i].blue2: found = True
-            if matches[i].blue3 is not None:
-                if text in matches[i].blue3: found = True
-
-            print(i)
-            if found:
-                self.tableView.showRow(i)
-            else:
-                self.tableView.hideRow(i)
-
-
+        self.tableView.updateFilter(self.searchBox.text())
 
 
 class RecordedMatchesViewModel(QAbstractTableModel):
@@ -171,12 +151,63 @@ class RecordedMatchesTable(QTableView):
         QTableView.__init__(self, parent)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setStretchLastSection(True)
-        self.tournamentModel = RecordedMatchesViewModel(tournament=datasource.current_tournament)
-        self.setModel(self.tournamentModel)
-
+        self.filter = MatchFilter()
+        self.setModel(self.filter)
         self.setAlternatingRowColors(True)
         self.setShowGrid(False)
         self.setItemDelegateForColumn(8, WatchPushButtonDelegate(self))
+
+    def updateFilter(self, text):
+        print(self.filter)
+        self.filter.setFilterText(text)
+
+
+class MatchFilter(QSortFilterProxyModel):
+    filterText = ""
+
+    def __init__(self,parent = None):
+        QSortFilterProxyModel.__init__(self,parent)
+        self.tournamentModel = RecordedMatchesViewModel(tournament=datasource.current_tournament)
+        self.setSourceModel(self.tournamentModel)
+
+    def setFilterText(self, text):
+        self.filterText = text
+        self.invalidateFilter()
+
+    def filterAcceptsRow(self, row, parent):
+        num_index = self.sourceModel().index(row, 0, parent)
+        red1_index = self.sourceModel().index(row, 1, parent)
+        red2_index = self.sourceModel().index(row, 2, parent)
+        red3_index = self.sourceModel().index(row, 3, parent)
+        blue1_index = self.sourceModel().index(row, 4, parent)
+        blue2_index = self.sourceModel().index(row, 5, parent)
+        blue3_index = self.sourceModel().index(row, 6, parent)
+
+
+        num_str = self.sourceModel().data(num_index)
+        red1_str = self.sourceModel().data(red1_index)
+        red2_str = self.sourceModel().data(red2_index)
+        red3_str = self.sourceModel().data(red3_index)
+        blue1_str = self.sourceModel().data(blue1_index)
+        blue2_str = self.sourceModel().data(blue2_index)
+        blue3_str = self.sourceModel().data(blue3_index)
+
+        if self.filterText in num_str:
+            return True
+        if self.filterText in red1_str:
+            return True
+        if self.filterText in red2_str:
+            return True
+        if self.filterText in red3_str:
+            return True
+        if self.filterText in blue1_str:
+            return True
+        if self.filterText in blue2_str:
+            return True
+        if self.filterText in blue3_str:
+            return True
+
+        return False
 
 class WatchPushButtonDelegate(QItemDelegate):
     def __init__(self, parent):

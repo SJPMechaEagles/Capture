@@ -138,6 +138,7 @@ class VideoWindow(QMainWindow):
         self.updateStatusDisplay()
 
     def startRecording(self):
+        self.updateStatusDisplay()
         if get_current_tournament() is None:
             print("Tournament None!")
             return
@@ -149,8 +150,10 @@ class VideoWindow(QMainWindow):
             .videos.append(filename)
         self.recordButton.updateStyle(self.isRecording)
         self.id = self.comboBox.currentIndex()
+        self.updateStatusDisplay()
 
     def stopRecording(self):
+        self.updateStatusDisplay()
         if get_current_tournament() is None:
             print("Tournament None")
             return
@@ -161,6 +164,7 @@ class VideoWindow(QMainWindow):
         get_current_tournament().save()
         self.comboBox.setCurrentIndex(self.id)
         self.match_recording = None
+        self.updateStatusDisplay()
 
     def onQuit(self):
         print("quit")
@@ -254,6 +258,7 @@ class VideoWindow(QMainWindow):
         self.load_default()
 
         self.recordButton.updateStyle(False)
+        self.updateStatusDisplay()
 
     # loads the default touranment file
     def load_default(self):
