@@ -8,7 +8,6 @@ from datasource import *
 from tournamentDialogs import *
 
 if __name__ == '__main__':
-    #create_test_tournament()
     app = PyQt5.QtWidgets.QApplication(sys.argv)
     camera = Camera()
     camera.iniCamera()

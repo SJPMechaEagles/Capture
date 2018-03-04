@@ -26,7 +26,7 @@ class InfoDisplay(QHBoxLayout):
     def updateInfo(self, match_number, teams, isRecording):
         # the string looks like: Q5: 9228A 9228B ...
         if (match_number is not None):
-            teamsString = "Match " + match_number_to_string(match_number) + ":"
+            teamsString = "Match " + (match_number) + ":"
             for team in teams:
                   teamsString += " " + team
             self.teamsLabel.setText(teamsString)

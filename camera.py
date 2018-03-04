@@ -49,8 +49,6 @@ class Camera(QObject):
         self.recorder.setVideoSettings(video)
         self.recorder.setContainerFormat("mp4")
 
-        print(self.recorder.outputLocation())
-
     def startRecording(self, filename):
         directory = os.path.abspath(str(os.getcwd()))
         abs_path = os.path.join(directory, filename)

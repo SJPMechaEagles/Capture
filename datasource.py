@@ -101,7 +101,6 @@ class Tournament:
             return
         print(self.sku)
         params['sku'] = self.sku
-        print("request")
         resp = requests.get('https://api.vexdb.io/v1/get_matches', params)
         matches = resp.json()['result']
         results = []
@@ -136,7 +135,6 @@ def load_from_file(filename):
     with open(filename, 'rb') as file:
         global current_tournament
         current_tournament = pickle.load(file)
-        print(current_tournament)
 
 class Match:
 

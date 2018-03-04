@@ -92,6 +92,7 @@ class VideoWindow(QMainWindow):
             self.id = 0
             self.match_recording = None
             self.comboBox.activated.connect(self.matchSelected)
+        self.updateStatusDisplay()
 
     def save(self):
         if get_current_tournament() is None:
@@ -103,11 +104,13 @@ class VideoWindow(QMainWindow):
         
         if (path != ""):
             get_current_tournament().save(name)
+        self.updateStatusDisplay()
 
     def updatepull(self):
         if get_current_tournament() is not None:
             get_current_tournament().update_match_data()
             self.reload()
+        self.updateStatusDisplay()
 
     def open(self):
         options = QFileDialog.Options()
@@ -118,6 +121,7 @@ class VideoWindow(QMainWindow):
             load_from_file(fileName)
             self.reload_combo()
             self.remember_default(str(fileName))
+        self.updateStatusDisplay()
 
 
     def configure(self):
@@ -125,6 +129,7 @@ class VideoWindow(QMainWindow):
         dialog = ManualMatchesDialog();
         returnCode=dialog.exec_()
         print(returnCode)
+        self.updateStatusDisplay()
 
     def toggleRecording(self):
         if get_current_tournament() is None:
@@ -179,16 +184,16 @@ class VideoWindow(QMainWindow):
         
     def updateStatusDisplay(self):
         teams = ['','','','']
-        if get_current_tournament() is not None and self.match_number is not None:
-            if self.match_number is None:
-                self.match_number = 0
-            r1 = get_current_tournament().matches[self.match_number].red1
-            r2 = get_current_tournament().matches[self.match_number].red2
-            b1 = get_current_tournament().matches[self.match_number].blue1
-            b2 = get_current_tournament().matches[self.match_number].blue2
+        if get_current_tournament() is not None:
+            r1 = get_current_tournament().matches[self.comboBox.currentIndex()].red1
+            r2 = get_current_tournament().matches[self.comboBox.currentIndex()].red2
+            b1 = get_current_tournament().matches[self.comboBox.currentIndex()].blue1
+            b2 = get_current_tournament().matches[self.comboBox.currentIndex()].blue2
             teams = [r1, r2, b1, b2]
-        self.updateWindowTitle(match_number=self.match_number, teams=teams)
-        self.infoDisplay.updateInfo(self.match_number, teams, self.isRecording)
+            print(teams)
+        self.updateWindowTitle(match_number=get_current_tournament().
+                               matches[self.comboBox.currentIndex()].toId(), teams=teams)
+        self.infoDisplay.updateInfo(get_current_tournament().matches[self.comboBox.currentIndex()].toId(), teams, self.isRecording)
 
     def updateWindowTitle(self, match_number=None, teams=None):
         if get_current_tournament() is None:
@@ -199,9 +204,9 @@ class VideoWindow(QMainWindow):
             self.setWindowTitle('VEX Match Recorder - [No Match Selected]')
         else:
             if (self.isRecording):
-                title = 'VEX Match Recorder - Match ' + match_number_to_string(match_number) + " Teams "
+                title = 'VEX Match Recorder - Match ' + (match_number) + " Teams "
             else:
-                title = 'VEX Match Recorder - Match ' + match_number_to_string(match_number) + " Teams "
+                title = 'VEX Match Recorder - Match ' + (match_number) + " Teams "
             # add the teams to the title
             for team in teams:
                 title += str(team) + " "
@@ -274,6 +279,7 @@ class VideoWindow(QMainWindow):
                 self.reload_combo()
             except:
                 print("Failed to load default tournament file!")
+        self.updateStatusDisplay()
 
     def remember_default(self, filename):
         file = open("defaults.cfg", "w")
