@@ -184,7 +184,7 @@ class VideoWindow(QMainWindow):
         
     def updateStatusDisplay(self):
         teams = ['','','','']
-        if get_current_tournament() is not None:
+        if get_current_tournament() is not None and get_current_tournament().matches is not None:
             r1 = get_current_tournament().matches[self.comboBox.currentIndex()].red1
             r2 = get_current_tournament().matches[self.comboBox.currentIndex()].red2
             b1 = get_current_tournament().matches[self.comboBox.currentIndex()].blue1
@@ -262,7 +262,7 @@ class VideoWindow(QMainWindow):
         #load default tournament file
         self.load_default()
 
-        self.recordButton.updateStyle(False)
+        # self.recordButton.updateStyle(False)
         self.updateStatusDisplay()
 
     # loads the default touranment file
