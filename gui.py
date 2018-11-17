@@ -191,9 +191,9 @@ class VideoWindow(QMainWindow):
             b2 = get_current_tournament().matches[self.comboBox.currentIndex()].blue2
             teams = [r1, r2, b1, b2]
             print(teams)
-        self.updateWindowTitle(match_number=get_current_tournament().
+            self.updateWindowTitle(match_number=get_current_tournament().
                                matches[self.comboBox.currentIndex()].toId(), teams=teams)
-        self.infoDisplay.updateInfo(get_current_tournament().matches[self.comboBox.currentIndex()].toId(), teams, self.isRecording)
+            self.infoDisplay.updateInfo(get_current_tournament().matches[self.comboBox.currentIndex()].toId(), teams, self.isRecording)
 
     def updateWindowTitle(self, match_number=None, teams=None):
         if get_current_tournament() is None:
